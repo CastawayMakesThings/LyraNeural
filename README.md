@@ -16,9 +16,14 @@ NOTE: PLEASE DONT JUDGE THE CODE.
 ## Description
 
 Lyra Neural is a simple ML API for Java, that works in a very basic way. Although it may require some previous knowledge of how Neural Networks work, the API itself is quite easy to learn, with only a handful of methods you need to know.
-## Licensing
 
 ![Static Badge](https://img.shields.io/badge/License-APACHE2.0-orange)
+
+## Downloads
+
+[Latest Release | v 1.01](https://github.com/CastawayMakesThings/LyraNeural/releases/tag/Release)
+
+(No other versions, I will fix that soon! 😁)
 
 ## Changelog
 
