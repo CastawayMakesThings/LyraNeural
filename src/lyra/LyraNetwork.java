@@ -5,6 +5,12 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.*;
 
+
+
+//DISCLAIMER, PLEASE DON'T JUDGE MY CODE. FOR SUGGESTIONS AND REPORTING ISSUES, CONTACT MY DISCORD IN THE README FILE.
+
+
+
 public class LyraNetwork {
     Neuron[][] neuronNetwork;
     private int[] hiddenLayerSize;
@@ -24,10 +30,12 @@ public class LyraNetwork {
     private String modelMetadata;
 
 
+    //Sets the size of the hidden layers.
     public void hiddenLayerSize(int[] size) {
         hiddenLayerSize = size;
     }
 
+    //Changes the activation function
     public void setActivationFunction(String function) {
         function = function.toLowerCase();
         switch (function) {
@@ -45,10 +53,20 @@ public class LyraNetwork {
         }
     }
 
+    //Sets the activation function, but an int input
+    public void setActivationFunction(int function) {
+        if(function > 2) {
+            throw new IllegalArgumentException("UNKNOWN ACTIVATION FUNCTION SELECTED. \n USE 0 for Sigmoid,\n 1 for ReLU,\n and 2 for tanh");
+        }
+        activationFunction = function;
+    }
+
+    //Prints the intro message
     public LyraNetwork() {
         System.out.println("LyraNetwork version "+lyraAPIVersion+" loaded!");
     }
 
+    //Sets any model metadata
     public void setModelMetadata(String i) {
         if(i.contains("#") || i.contains("@@")) {
             throw new modelFileLoaderException("ERROR: METADATA CONTAINS ILLEGAL CHARACTERS");
@@ -57,19 +75,14 @@ public class LyraNetwork {
         }
     }
 
+    //Makes it easier to print feed results
     public static void printResults(double[] input) {
         for (double v : input) {
             System.out.println(v);
         }
     }
 
-    public void setActivationFunction(int function) {
-        if(function > 2) {
-            throw new IllegalArgumentException("UNKNOWN ACTIVATION FUNCTION SELECTED. \n USE 0 for Sigmoid,\n 1 for ReLU,\n and 2 for tanh");
-        }
-        activationFunction = function;
-    }
-
+    //Sets all the neurons
     public void setNeurons(int[] allNeurons) {
         if(!(allNeurons.length > 2)) {
             throw new IllegalArgumentException("ERROR: NETWORK MUST HAVE MORE THAN TWO LAYERS.");
@@ -81,14 +94,17 @@ public class LyraNetwork {
         outputLayerSize = allNeurons[allNeurons.length-1];
     }
 
+    //Sets an error goal for training
     public void precisionGoal(double goal) {
         this.goal = goal;
     }
 
+    //Sets the front layer size
     public void frontLayerSize(int size) {
         frontLayerSize = size;
     }
 
+    //Returns any model metadata
     public String getModelMetadata() {
         if(! modelMetadata.isEmpty() || modelMetadata.isBlank()) {
             return modelMetadata;
@@ -98,59 +114,58 @@ public class LyraNetwork {
         }
     }
 
+    //Sets the output layer size
     public void outputLayerSize(int size) {
         outputLayerSize = size;
     }
 
+    //Sets the learning rate
     public void setLearningRate(double rate) {
         learningRate = rate;
     }
 
+    //Sets how many epochs the model has to train
     public void setEpochThreshold(int epochs) {
         epochSensitivity = epochs;
     }
 
+    //If it should print the status of training
     public void shouldShowStatus(boolean x) {
         showStatus = x;
     }
 
+    //Sets a time limit for training, in seconds
     public void timeLimit(long seconds) {
         this.time = seconds * 1000000000;
     }
 
+
+    //All of the activation functions
     private double sigmoid(double x) {
         return 1 / (1 + Math.exp(-x));
     }
-
     private double sigmoidDerivative(double x) {
         return x * (1 - x); // NOTE: x should be output of sigmoid, not raw input!
     }
-
     private double relu(double x) {
         return Math.max(0, x);
     }
-
     private double reluDerivative(double x) {
         return x > 0 ? 1 : 0;
     }
-
     private double tanh(double x) {
         return Math.tanh(x);
     }
-
     private double tanhDerivative(double x) {
         double tanhVal = Math.tanh(x);
         return 1 - tanhVal * tanhVal;
     }
-
     private double leakyRelu(double x) {
         return x > 0 ? x : 0.01 * x;
     }
-
     private double leakyReluDerivative(double x) {
         return x > 0 ? 1 : 0.01;
     }
-
     private double calculate(double x, boolean isDerivative) {
         switch (activationFunction) {
             case 0:
@@ -166,6 +181,7 @@ public class LyraNetwork {
         }
     }
 
+    //A method that extracts all digits from a string
     public String extractNumbers(String input) {
         StringBuilder result = new StringBuilder();
         boolean hasDecimal = false;
@@ -188,7 +204,7 @@ public class LyraNetwork {
         return result.toString();
     }
 
-
+    //Initializes the network
     public void init() {
         if (isInitialized) return;
 
@@ -223,6 +239,7 @@ public class LyraNetwork {
         isInitialized = true;
     }
 
+    //Checks the network for it's error
     public double evaluate(double[][] inputs, double[][] wantedResults) {
         double[] error = new double[inputs.length];
         double[] result;
@@ -260,6 +277,7 @@ public class LyraNetwork {
         return totalError;
     }
 
+    //Feeds the network
     public double[] feed(double[] inputs) {
         double[] outputs = new double[outputLayerSize];
 
@@ -303,6 +321,7 @@ public class LyraNetwork {
     }
 
 
+    //Trains the network
     public void train(double[][] inputs, double[][] wantedResults) {
         System.out.println("Training...");
 
@@ -418,6 +437,7 @@ public class LyraNetwork {
         System.out.println("TOTAL ERROR: "+totalError);
     }
 
+    //Saves the model
     public void saveModel(String filePath) {
         if(!isInitialized) {
             throw new IllegalStateException("ERROR: CAN NOT SAVE UNINITIALIZED MODEL");
@@ -464,6 +484,7 @@ public class LyraNetwork {
 
     }
 
+    //Loads the model
     public void loadModel(String filePath) {
         File file = new File(filePath);
         if(!file.exists()) {
