@@ -2,10 +2,10 @@
 ![Logo.png](<https://media-hosting.imagekit.io/073275a5510f4116/Logo.png?Expires=1838970184&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=UZp2S-sRp2LydlRq32Zm0cI4M2TO~riZIASCxjHM2cxK0KnVof-lI4oHFHbO3O3b6vSTWepYFKdgZoDN0DmtKjoG58arsbEf4UzHaysFWz2D~0gihKhJ-ufMqF7KWeKg1s2caE1oqZnyMGYFnakXquVc6X73dyuHHiQlYiq~t7bbEZvt03V~qWwNhwObtLuS620aP3kHF2PSJtXAgTCJoviWi5tzcL4ga4cfSZwA5zQa~hninzZGglfSyBR1HejoTCmeZDQ7Zhjf55zYBq0rGuPc1CnrRSJQvJJlZLvkRx6y~xfJX7qQPGHnS9-gxI2fcmTR~vxEan6DqipeK6fj5w__>)
 
 
-# Lyra Neural v 1.0.1
+# Lyra Neural v1.01
 
 A simple, lightweight, open-source, and easy API for integrating simple ai into your projects.
-NOTE: PLEASE DONT JUDGE THE CODE.
+NOTE: PLEASE DON'T JUDGE THE CODE.
 
 
 ## Authors
