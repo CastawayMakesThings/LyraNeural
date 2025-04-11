@@ -1,6 +1,27 @@
-# LYRA Documentation BETA.3
 
-Welcome to LYRA. LYRA is an extremely lightweight and versatile API for AI integration.
+![Logo](https://raw.githubusercontent.com/CastawayMakesThings/LyraNeural/refs/heads/master/src/lyra/Logo.png?token=GHSAT0AAAAAADB7J26EJCUL7HIRFLRAIMQAZ7Y2HIQ)
+
+
+# Lyra Neural v 1.0.1
+
+A simple, lightweight, open-source, and easy API for integrating simple ai into your projects.
+
+
+## Authors
+
+- [AnotherCastaway (@CastawayMakesThings)](https://www.github.com/CastawayMakesThings)
+
+
+## Description
+
+Lyra Neural is a simple ML API for Java, that works in a very basic way. Although it may require some previous knowledge of how Neural Networks work, the API itself is quite easy to learn, with only a handful of methods you need to know.
+## Licensing
+
+![Static Badge](https://img.shields.io/badge/License-APACHE2.0-orange)
+
+
+
+## Documentation
 
 ## -Installation-
 
@@ -187,26 +208,27 @@ And voilà! You have loaded up a model you can now feed.
 
 ## -METHODS-
 
-    Method Name        Inputs      Returns     Description
+| Method Name            | Inputs                                           | Returns   | Description                                                                                                                                                         |
+|------------------------|--------------------------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `hiddenLayerSize`      | int[] size                                       | void      | Sets the hidden layer's neuron count.                                                                                                                               |
+| `setActivationFunction`| String function OR int func                      | void      | Sets the activation function. Options: `relu`, `sigmoid`, `tanh`, or use 0, 1, or 2.                                                                                |
+| `setModelMetadata`     | String data                                      | void      | Sets metadata that will be embedded when `saveModel` is called. If `~` is typed in metadata, anything after it will be printed upon loading.                       |
+| `setNeurons`           | int[] allNeurons                                 | void      | Sets all the neurons in a network. E.g., {2,4,4,2} means layers with 2, 4, 4, and 2 neurons respectively.                                                           |
+| `precisionGoal`        | double goal                                      | void      | If the model reaches the given accuracy, training will automatically end.                                                                                           |
+| `frontLayerSize`       | int size                                         | void      | Sets the size of the front layer.                                                                                                                                   |
+| `getModelMetadata`     | none                                             | String    | Returns any metadata in the model.                                                                                                                                  |
+| `outputLayerSize`      | int size                                         | void      | Sets the size of the last layer.                                                                                                                                    |
+| `setLearningRate`      | double rate                                      | void      | Sets the learning rate — how coarse the adjustments are.                                                                                                            |
+| `setEpochThreshold`    | int epochs                                       | void      | Sets how many epochs (iterations) the network has to train.                                                                                                         |
+| `timeLimit`            | long seconds                                     | void      | Sets the time limit for training in seconds. **MAY BE BROKEN**                                                                                                      |
+| `init`                 | none                                             | void      | Initializes the network with random weights and biases. Required to train custom networks.                                                                          |
+| `evaluate`             | double[][] inputs, double[][] wantedResults      | double    | Feeds all the data into the network and returns the average error.                                                                                                  |
+| `feed`                 | double[] inputs                                  | double[]  | Feeds the network the values and returns the output. Input array size must match neuron count in the first layer.                                                  |
+| `train`                | double[][] inputs, double[][] wantedResults      | void      | Trains the network on the data given.                                                                                                                               |
+| `saveModel`            | String filepath                                  | void      | Saves the neurons, weights, biases, activation functions, and metadata to the selected filepath.                                                                   |
+| `loadModel`            | String filePath                                  | void      | Loads the model from the selected `.lyra` file.                                                                                                                     |
+| `printResults`         | double[] input                                   | void      | A tool to easily print the results from feeding a network.                                                                                                          |
 
-1. `hiddenLayerSize`      |  int[] size  | void   | Sets the hidden layer's neuron count.     
-2. `setActivationFunction` | String function OR int func | void | Sets the activation function. Options: `relu`, `sigmoid`, `tanh`, or use 0,1 or 2
-3. `setModelMetadata`    | String data | void | Sets metadata that will be embedded when `saveModel` is called. If '~' is typed in metadata, anything after it will be printed upon loading.
-4. `setNeurons`  | int[] allNeurons | void | Sets all the neurons in a network. E.G, {2,4,4,2} means First layer: 2, second layer: 4, third layer: 4 and last layer: 2.
-5. `precisionGoal` | double goal | void | If the model reaches the given accuracy, training will automatically end.
-6. `frontLayerSize` | int size | void | Sets the size of the front layer.
-7. `getModelMetadata` | none | String | returns any metadata in the model.
-8. `outputLayerSize` | int size | void | sets the e of the last layer
-9. `setLearningRate` | double rate | void | Sets the learning rate, how course the adjustments are.
-10. `setEpochThreshold` | int epochs | void | Sets how many epochs (iterations) the network has to train.
-11. `timeLimit` | long seconds | void | Sets the time limit for training in seconds. **MAY BE BROKEN**
-12. `init` | none | void | Initializes the network with random weights and biases. Required to train custom networks.
-13. `evaluate` | double[][] inputs, double[][] wantedResults | double | Feeds all the data into the network and returns the average error
-14. `feed` | double[] inputs | double[] | Feeds the network the values and returns the output. The array must have the same amount of values as the amount of neurons in the first layer.
-15. `train` | double[][] inputs, double[][] wantedResults| void | Trains the network on the data given.
-16. `saveModel` | String filepath | void | Saves the neurons, weights, biases, activation functions, and metadata to the selected filepath.
-17. `loadModel` | String filePath | void | Loads the model from the selected .lyra file.
-18. `printResults` | double[] input | void | A tool to make printing the results from feeding a network easy.
 
 
 ## -OTHER INFO-
@@ -245,4 +267,6 @@ and if we input the SECOND array of inputs[][] (1,1,1,1) into the model, we want
 
 and on and on. For a model like this, you would probably want more data.
 
+
+## For support, contact my Discord @castawaymakesthings
 
