@@ -1,5 +1,5 @@
 
-![Logo]([https://raw.githubusercontent.com/CastawayMakesThings/LyraNeural/refs/heads/master/src/lyra/Logo.png?token=GHSAT0AAAAAADB7J26EJCUL7HIRFLRAIMQAZ7Y2HIQ](https://ibb.co/v6sBhZV8))
+![Logo](https://ibb.co/v6sBhZV8)
 
 
 # Lyra Neural v 1.0.1
