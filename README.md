@@ -26,7 +26,7 @@ Lyra Neural is a simple ML API for Java, that works in a very basic way. Althoug
 
 ## -Installation-
 
-To install it is simple. Download the official release from the "Releases" tab. Make sure you have the JAR in the location you want.
+To install it is simple. Download the official release from the from [here](https://github.com/CastawayMakesThings/LyraNeural/releases/tag/Release). Make sure you have the JAR in the location you want.
 This API was made for IntelliJ, but should work for others.
 
 ###  IntelliJ IDEA
