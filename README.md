@@ -1,5 +1,5 @@
 
-![Logo](https://ibb.co/v6sBhZV8)
+![LYRA Logo](https://i.ibb.co/v6sBhZV8)
 
 
 # Lyra Neural v 1.0.1
