@@ -5,6 +5,7 @@
 # Lyra Neural v 1.0.1
 
 A simple, lightweight, open-source, and easy API for integrating simple ai into your projects.
+NOTE: PLEASE DONT JUDGE THE CODE.
 
 
 ## Authors
