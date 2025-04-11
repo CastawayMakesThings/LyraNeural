@@ -20,7 +20,10 @@ Lyra Neural is a simple ML API for Java, that works in a very basic way. Althoug
 
 ![Static Badge](https://img.shields.io/badge/License-APACHE2.0-orange)
 
+## Changelog
 
+First version released! 🎉
+Licensed the project!
 
 ## Documentation
 
@@ -268,6 +271,17 @@ and if we input the SECOND array of inputs[][] (1,1,1,1) into the model, we want
 
 and on and on. For a model like this, you would probably want more data.
 
+## Possible Future Additions
+
+Some features that I would hope to add are:
+
+Model Presets
+
+More Advanced Metadata
+
+Example models
+
+Most important: Maven/Gradle support.
 
 ## For support, contact my Discord @castawaymakesthings
 
