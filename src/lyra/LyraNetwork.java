@@ -7,7 +7,8 @@ import java.util.*;
 
 
 
-//DISCLAIMER, PLEASE DON'T JUDGE MY CODE. FOR SUGGESTIONS AND REPORTING ISSUES, CONTACT MY DISCORD IN THE README FILE.
+//DISCLAIMER, PLEASE DON'T JUDGE MY CODE. FOR SUGGESTIONS AND REPORTING ISSUES, CONTACT MY DISCORD IN
+
 
 
 
@@ -138,48 +139,43 @@ public class LyraNetwork {
     public void timeLimit(long seconds) {
         this.time = seconds * 1000000000;
     }
-
-
-    //All of the activation functions
-    private double sigmoid(double x) {
-        return 1 / (1 + Math.exp(-x));
-    }
-    private double sigmoidDerivative(double x) {
-        return x * (1 - x); // NOTE: x should be output of sigmoid, not raw input!
-    }
-    private double relu(double x) {
-        return Math.max(0, x);
-    }
-    private double reluDerivative(double x) {
-        return x > 0 ? 1 : 0;
-    }
-    private double tanh(double x) {
-        return Math.tanh(x);
-    }
-    private double tanhDerivative(double x) {
-        double tanhVal = Math.tanh(x);
-        return 1 - tanhVal * tanhVal;
-    }
-    private double leakyRelu(double x) {
-        return x > 0 ? x : 0.01 * x;
-    }
-    private double leakyReluDerivative(double x) {
-        return x > 0 ? 1 : 0.01;
-    }
-    private double calculate(double x, boolean isDerivative) {
+    public double calculate(double x, boolean derivative) {
         switch (activationFunction) {
-            case 0:
-                return isDerivative ? sigmoidDerivative(x) : sigmoid(x);
-            case 1:
-                return isDerivative ? reluDerivative(x) : relu(x);
-            case 2:
-                return isDerivative ? tanhDerivative(x) : tanh(x);
-            case 3:
-                return isDerivative ? leakyReluDerivative(x) : leakyRelu(x);
+            case 0: // sigmoid
+                if (derivative) {
+                    // assuming x is already sigmoid(x)
+                    return x * (1 - x);
+                } else {
+                    return 1.0 / (1.0 + Math.exp(-x));
+                }
+
+            case 1: // ReLU
+                if (derivative) {
+                    return x > 0 ? 1.0 : 0.0;
+                } else {
+                    return x > 0 ? x : 0.0;
+                }
+
+            case 2: // tanh
+                if (derivative) {
+                    double tanhVal = Math.tanh(x);
+                    return 1.0 - tanhVal * tanhVal;
+                } else {
+                    return Math.tanh(x);
+                }
+
+            case 3: // leaky ReLU
+                if (derivative) {
+                    return x > 0 ? 1.0 : 0.01;
+                } else {
+                    return x > 0 ? x : 0.01 * x;
+                }
+
             default:
-                throw new IllegalStateException("Unknown activation function selected");
+                throw new IllegalStateException("Unknown activation function");
         }
     }
+
 
     //A method that extracts all digits from a string
     public String extractNumbers(String input) {
@@ -212,32 +208,54 @@ public class LyraNetwork {
         hiddenValues = new double[neuronNetwork.length][];
 
         for (int i = 0; i < neuronNetwork.length; i++) {
+            int layerSize;
             if (i == 0) {
-                neuronNetwork[i] = new Neuron[frontLayerSize];
-                hiddenValues[i] = new double[frontLayerSize];
+                layerSize = frontLayerSize;
             } else if (i == neuronNetwork.length - 1) {
-                neuronNetwork[i] = new Neuron[outputLayerSize];
-                hiddenValues[i] = new double[outputLayerSize];
+                layerSize = outputLayerSize;
             } else {
-                neuronNetwork[i] = new Neuron[hiddenLayerSize[i - 1]];
-                hiddenValues[i] = new double[hiddenLayerSize[i - 1]];
+                layerSize = hiddenLayerSize[i - 1];
             }
 
-            for (int j = 0; j < neuronNetwork[i].length; j++) {
-                neuronNetwork[i][j] = new Neuron();
-                neuronNetwork[i][j].bias = random.nextDouble() * 2 - 1; // [-1, 1]
+            neuronNetwork[i] = new Neuron[layerSize];
+            hiddenValues[i] = new double[layerSize];
+
+            for (int j = 0; j < layerSize; j++) {
+                Neuron neuron = new Neuron();
+
+                // Bias: small value to push ReLU neurons into action
+                neuron.bias = random.nextDouble() * 0.2 - 0.1; // [-0.1, 0.1]
 
                 if (i > 0) {
-                    neuronNetwork[i][j].weights = new double[neuronNetwork[i - 1].length];
-                    for (int k = 0; k < neuronNetwork[i][j].weights.length; k++) {
-                        neuronNetwork[i][j].weights[k] = random.nextDouble() * 2 - 1; // [-1, 1]
+                    int inputSize = neuronNetwork[i - 1].length;
+                    neuron.weights = new double[inputSize];
+
+                    // Choose initialization strategy based on activation function
+                    double scale;
+                    switch (activationFunction) {
+                        case 1:
+                        case 3:
+                            scale = Math.sqrt(2.0 / inputSize); // He initialization
+                            break;
+                        case 2:
+                        case 0:
+                        default:
+                            scale = Math.sqrt(1.0 / inputSize); // Xavier initialization
+                            break;
+                    }
+
+                    for (int k = 0; k < inputSize; k++) {
+                        neuron.weights[k] = random.nextGaussian() * scale;
                     }
                 }
+
+                neuronNetwork[i][j] = neuron;
             }
         }
 
         isInitialized = true;
     }
+
 
     //Checks the network for it's error
     public double evaluate(double[][] inputs, double[][] wantedResults) {
@@ -275,6 +293,14 @@ public class LyraNetwork {
         totalError = totalError / error.length;
 
         return totalError;
+    }
+
+    private double sumDeltas(Neuron[] nextLayer, double[] nextDeltas, int neuronIndex) {
+        double sum = 0.0;
+        for (int i = 0; i < nextLayer.length; i++) {
+            sum += nextDeltas[i] * nextLayer[i].weights[neuronIndex];
+        }
+        return sum;
     }
 
     //Feeds the network
@@ -321,121 +347,85 @@ public class LyraNetwork {
     }
 
 
-    //Trains the network
-    public void train(double[][] inputs, double[][] wantedResults) {
-        System.out.println("Training...");
-
-        if(!isInitialized) {
-            System.out.println("NOTE: MODEL NOT YET INITIALIZED, AUTO INITIALIZING...");
+    public void train(double[][] inputs, double[][] expectedOutputs) {
+        if (!isInitialized) {
             init();
         }
 
-        if(hiddenLayerSize.length > 2 && !(activationFunction == 0)) {
-            throw new IllegalStateException("ERROR: SHALLOW NETWORKS (Networks with only 1 hidden layer) ARE ONLY COMPATIBLE WITH SIGMOID");
-        }
-
-        if (inputs == null || wantedResults == null || inputs.length != wantedResults.length) {
-            throw new IllegalArgumentException("Invalid training data");
-        }
-
-        int dataPair = 0;
-        int iterations = 0;
-        double totalError = 999;
-        boolean isIterating = true;
-        long iterationTime = 0;
-
+        int samples = inputs.length;
         long startTime = System.nanoTime();
+        int epochs = 0;
 
-        while(isIterating) {
+        while (true) {
+            double totalError = 0.0;
 
-            if (iterations > epochSensitivity) {
-                isIterating = false;
-            }
+            for (int sampleIndex = 0; sampleIndex < samples; sampleIndex++) {
+                double[] input = inputs[sampleIndex];
+                double[] expected = expectedOutputs[sampleIndex];
 
-            if (iterationTime > time && time != 0) {
-                isIterating = false;
-            }
-
-            if(showStatus) {
-                System.out.println("EPOCH " + iterations);
-            }
-
-
-            if(dataPair >= inputs.length) {
-                dataPair = 0;
-            }
-
-            double[] result = feed(inputs[dataPair]);
-            double[] wantedResult = wantedResults[dataPair];
-
-            // Calculate output layer error
-            double[] outputError = new double[result.length];
-            double[] outputDelta = new double[result.length];
-            totalError = 0;
-
-            for (int i = 0; i < result.length; i++) {
-                outputError[i] = wantedResult[i] - result[i];
-                totalError += Math.pow(outputError[i], 2);
-                outputDelta[i] = outputError[i] * calculate(hiddenValues[neuronNetwork.length - 1][i], true);
-            }
-            totalError *= 0.5;
-
-            if(totalError < goal) {
-                isIterating = false;
-            }
-
-            // Calculate hidden layer errors
-            double[][] hiddenError = new double[neuronNetwork.length][];
-            double[][] hiddenDelta = new double[neuronNetwork.length][];
-
-            // Initialize arrays
-            for (int h = 0; h < neuronNetwork.length; h++) {
-                hiddenError[h] = new double[neuronNetwork[h].length];
-                hiddenDelta[h] = new double[neuronNetwork[h].length];
-            }
-
-            for (int h = neuronNetwork.length - 2; h > 0; h--) {
-                for (int i = 0; i < neuronNetwork[h].length; i++) {
-                    hiddenError[h][i] = 0;
-                    for (int j = 0; j < neuronNetwork[h + 1].length; j++) {
-                        hiddenError[h][i] += neuronNetwork[h + 1][j].weights[i] *
-                                (h == neuronNetwork.length - 2 ? outputDelta[j] : hiddenDelta[h + 1][j]);
+                // Forward pass
+                hiddenValues[0] = input;
+                for (int layer = 1; layer < neuronNetwork.length; layer++) {
+                    hiddenValues[layer] = new double[neuronNetwork[layer].length];
+                    for (int j = 0; j < neuronNetwork[layer].length; j++) {
+                        double sum = 0.0;
+                        for (int k = 0; k < neuronNetwork[layer - 1].length; k++) {
+                            sum += hiddenValues[layer - 1][k] * neuronNetwork[layer][j].weights[k];
+                        }
+                        sum += neuronNetwork[layer][j].bias;
+                        hiddenValues[layer][j] = calculate(sum, false);
                     }
-                    hiddenDelta[h][i] = hiddenError[h][i] * calculate(hiddenValues[h][i], true);
                 }
-            }
 
-            // Update output layer weights
-            for (int i = 0; i < outputLayerSize; i++) {
-                for (int j = 0; j < neuronNetwork[neuronNetwork.length - 2].length; j++) {
-                    neuronNetwork[neuronNetwork.length - 1][i].weights[j] +=
-                            learningRate * outputDelta[i] * neuronNetwork[neuronNetwork.length - 2][j].value;
+                // Calculate error (output layer)
+                double[] output = hiddenValues[hiddenValues.length - 1];
+                double[] outputError = new double[output.length];
+                for (int i = 0; i < output.length; i++) {
+                    outputError[i] = expected[i] - output[i];
+                    totalError += outputError[i] * outputError[i];
                 }
-                neuronNetwork[neuronNetwork.length - 1][i].bias += learningRate * outputDelta[i];
-            }
 
-            // Update hidden layer weights
-            for (int h = neuronNetwork.length - 2; h > 0; h--) {
-                for (int i = 0; i < neuronNetwork[h].length; i++) {
-                    for (int j = 0; j < neuronNetwork[h - 1].length; j++) {
-                        neuronNetwork[h][i].weights[j] +=
-                                learningRate * hiddenDelta[h][i] * neuronNetwork[h - 1][j].value;
+                // Backward pass
+                double[][] deltas = new double[neuronNetwork.length][];
+                for (int i = neuronNetwork.length - 1; i > 0; i--) {
+                    deltas[i] = new double[neuronNetwork[i].length];
+                    for (int j = 0; j < neuronNetwork[i].length; j++) {
+                        double outputVal = hiddenValues[i][j];
+                        double error = (i == neuronNetwork.length - 1) ?
+                                outputError[j] :
+                                sumDeltas(neuronNetwork[i + 1], deltas[i + 1], j);
+                        deltas[i][j] = error * calculate(outputVal, true);
                     }
-                    neuronNetwork[h][i].bias += learningRate * hiddenDelta[h][i];
+                }
+
+                // Weight & bias update
+                for (int i = 1; i < neuronNetwork.length; i++) {
+                    for (int j = 0; j < neuronNetwork[i].length; j++) {
+                        for (int k = 0; k < neuronNetwork[i - 1].length; k++) {
+                            neuronNetwork[i][j].weights[k] += learningRate * deltas[i][j] * hiddenValues[i - 1][k];
+                        }
+                        neuronNetwork[i][j].bias += learningRate * deltas[i][j];
+                    }
                 }
             }
 
-            dataPair++;
-            iterations++;
+            totalError /= samples;
+            epochs++;
 
-            iterationTime = System.nanoTime() -startTime;
+            if (showStatus) {
+                System.out.println("Epoch " + epochs + ", Error: " + totalError);
+            }
 
+            if ((goal > 0 && totalError < goal) ||
+                    (epochSensitivity > 0 && epochs >= epochSensitivity) ||
+                    (time > 0 && System.nanoTime() - startTime > time)) {
+                break;
+            }
         }
-        long endTime = System.nanoTime();
-        long totalTime = endTime - startTime;
-        System.out.println("PROCESS COMPLETE! \nTRAINING TOOK "+ totalTime / 1000000000+" SECONDS.");
-        System.out.println("TOTAL ERROR: "+totalError);
+
+        System.out.println("Training complete after " + epochs + " epochs.");
     }
+
 
     //Saves the model
     public void saveModel(String filePath) {
