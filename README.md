@@ -27,6 +27,11 @@ Lyra Neural is a simple ML API for Java, that works in a very basic way. Althoug
 
 ## Changelog
 
+April 13, 2025:
+Fixed training process.
+Uploaded Lyra v1.0.2
+April 11, 2025:
+
 First version released! 🎉
 Licensed the project!
 
@@ -95,6 +100,12 @@ No parameters required!
 To define the neurons and layers, use three methods:
 
     frontLayerSize(count), hiddenLayerSize(array), outputLayerSize(count).
+Or you can use this one method:
+
+   ```java 
+    setNeurons(); //Use this to set all the whole architecture.
+```
+
 Here is an example of using it:
     
     myNetwork.frontLayerSize(2); //Two neurons in the first layer
@@ -106,7 +117,12 @@ Here is an example of using it:
     //Each value represents how many neurons are in that layer
     //As showed, we have 5 in the first hidden layer, 6 in the second, and 7 in the last.
 
-    myNetwork.hiddenLayerSize(neuronsHidden); //Inputting the array we made
+    myNetwork.hiddenLayerSize(neuronsHidden); //Inputting the array we made.
+
+Or we can use the setNeurons method
+   ```java
+    myNetwork.setNeurons(new double[] {2,5,6,7,3});
+```
 
 ### Step 3: Other parameters.
 
@@ -184,7 +200,7 @@ Here is the full code to make a network, train it, feed it, and evaluate it's er
         myAI.hiddenLayerSize(neurons);
         myAI.frontLayerSize(2);
         myAI.outputLayerSize(2);
-        myAI.setLearningRate(1.5);
+        myAI.setLearningRate(0.2);
         myAI.setEpochThreshold(50000000);
         myAI.setActivationFunction("relu");
 
@@ -199,7 +215,7 @@ Here is the full code to make a network, train it, feed it, and evaluate it's er
         double[] result = myAI.feed(test);
 
         LyraNetwork.printResults(result);
-        System.out.println(myAI.evaluate(input, output));
+        System.out.println(myAI.evaluate(input, wantedResults));
     }
 If you want to save your network, use the saveModel() method, and specify the filepath.
 
