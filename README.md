@@ -27,6 +27,11 @@ Lyra Neural is a simple ML API for Java, that works in a very basic way. Althoug
 
 ## Changelog
 
+April 13, 2025:
+Fixed training process.
+Uploaded Lyra v1.0.2
+April 11, 2025:
+
 First version released! 🎉
 Licensed the project!
 
@@ -112,7 +117,12 @@ Here is an example of using it:
     //Each value represents how many neurons are in that layer
     //As showed, we have 5 in the first hidden layer, 6 in the second, and 7 in the last.
 
-    myNetwork.hiddenLayerSize(neuronsHidden); //Inputting the array we made      
+    myNetwork.hiddenLayerSize(neuronsHidden); //Inputting the array we made.
+
+Or we can use the setNeurons method
+   ```java
+    myNetwork.setNeurons(new double[] {2,5,6,7,3});
+```
 
 ### Step 3: Other parameters.
 

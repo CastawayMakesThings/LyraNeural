@@ -24,8 +24,8 @@ public class LyraNetwork {
     private boolean showStatus = false;
     private long time = 0;
     private double goal = 0;
-    public final double lyraFileVersion = 1.0;
-    public final double lyraAPIVersion = 1.01;
+    public final String lyraFileVersion = "1.0";
+    public final String lyraAPIVersion = "1.0.2";
     private boolean isInitialized = false;
     private int activationFunction = 0;
     private String modelMetadata;
@@ -502,8 +502,7 @@ public class LyraNetwork {
         String[] a = s.toString().split("#");
 
         if(a[0].contains("v")){
-            String fyi = String.valueOf(lyraFileVersion);
-            if(! a[0].contains(fyi)) {
+            if(! a[0].contains(lyraFileVersion)) {
                 throw new versionMismatchException("ERROR: CAN NOT LOAD "+filePath+" AS IT IS OUTDATED");
             }
 
