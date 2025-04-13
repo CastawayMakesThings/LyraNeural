@@ -7,6 +7,8 @@
 A simple, lightweight, open-source, and easy API for integrating simple ai into your projects.
 NOTE: PLEASE DON'T JUDGE THE CODE.
 
+##NOTE, RELU IS CURRENTLY BROKEN!!!
+
 
 ## Authors
 
