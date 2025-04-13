@@ -2,7 +2,7 @@
 ![Logo.png](<https://media-hosting.imagekit.io/073275a5510f4116/Logo.png?Expires=1838970184&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=UZp2S-sRp2LydlRq32Zm0cI4M2TO~riZIASCxjHM2cxK0KnVof-lI4oHFHbO3O3b6vSTWepYFKdgZoDN0DmtKjoG58arsbEf4UzHaysFWz2D~0gihKhJ-ufMqF7KWeKg1s2caE1oqZnyMGYFnakXquVc6X73dyuHHiQlYiq~t7bbEZvt03V~qWwNhwObtLuS620aP3kHF2PSJtXAgTCJoviWi5tzcL4ga4cfSZwA5zQa~hninzZGglfSyBR1HejoTCmeZDQ7Zhjf55zYBq0rGuPc1CnrRSJQvJJlZLvkRx6y~xfJX7qQPGHnS9-gxI2fcmTR~vxEan6DqipeK6fj5w__>)
 
 
-# Lyra Neural v1.01
+# Lyra Neural v1.0.2
 
 A simple, lightweight, open-source, and easy API for integrating simple ai into your projects.
 NOTE: PLEASE DON'T JUDGE THE CODE.
@@ -21,17 +21,15 @@ Lyra Neural is a simple ML API for Java, that works in a very basic way. Althoug
 
 ## Downloads
 
-[Latest Release | v 1.01](https://github.com/CastawayMakesThings/LyraNeural/releases/tag/v1.0.2)
-
-(No other versions, I will fix that soon! 😁)
+[Latest Release | v 1.0.2](https://github.com/CastawayMakesThings/LyraNeural/releases/tag/v1.0.2)
 
 ## Changelog
 
 April 13, 2025:
 Fixed training process.
-Uploaded Lyra v1.0.2
-April 11, 2025:
+Uploaded Lyra v1.0.2.
 
+April 11, 2025:
 First version released! 🎉
 Licensed the project!
 
