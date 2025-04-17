@@ -1,6 +1,8 @@
 package lyra;
 
+import java.awt.*;
 import java.io.*;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.*;
@@ -27,13 +29,27 @@ public class LyraNetwork {
     public final String lyraFileVersion = "1.0";
     public final String lyraAPIVersion = "1.0.2";
     private boolean isInitialized = false;
-    private int activationFunction = 0;
+    private int activationFunction = 1;
     private String modelMetadata;
+    private boolean verboseTraining = false;
+    private int statusInterval = 1;
+    private double[][] preActivationValues;
+    private int epochs;
+    private boolean hasCrashed = false;
 
 
     //Sets the size of the hidden layers.
     public void hiddenLayerSize(int[] size) {
         hiddenLayerSize = size;
+    }
+
+    //Sets whether it should print the status of training
+    public void shouldPrintTrainingStatus(boolean x, int interval) {
+        if(interval < 1) {
+            throw new IllegalArgumentException("ERROR: TRAINING STATUS INTERVAL MUST BE MORE THAN 0!");
+        }
+        verboseTraining = x;
+        statusInterval = interval;
     }
 
     //Changes the activation function
@@ -42,7 +58,7 @@ public class LyraNetwork {
         switch (function) {
             case "sigmoid":
                 activationFunction = 0;
-                break;
+                throw new IllegalArgumentException("ERROR, SIGMOID IS BROKEN");
             case "relu":
                 activationFunction = 1;
                 break;
@@ -56,7 +72,7 @@ public class LyraNetwork {
 
     //Sets the activation function, but an int input
     public void setActivationFunction(int function) {
-        if(function > 2) {
+        if(function > 3) {
             throw new IllegalArgumentException("UNKNOWN ACTIVATION FUNCTION SELECTED. \n USE 0 for Sigmoid,\n 1 for ReLU,\n and 2 for tanh");
         }
         activationFunction = function;
@@ -224,7 +240,7 @@ public class LyraNetwork {
                 Neuron neuron = new Neuron();
 
                 // Bias: small value to push ReLU neurons into action
-                neuron.bias = random.nextDouble() * 0.2 - 0.1; // [-0.1, 0.1]
+                neuron.bias = 0.1 + random.nextGaussian() * 0.01;
 
                 if (i > 0) {
                     int inputSize = neuronNetwork[i - 1].length;
@@ -251,6 +267,11 @@ public class LyraNetwork {
 
                 neuronNetwork[i][j] = neuron;
             }
+        }
+
+        preActivationValues = new double[neuronNetwork.length][];
+        for (int i = 0; i < neuronNetwork.length; i++) {
+            preActivationValues[i] = new double[neuronNetwork[i].length];
         }
 
         isInitialized = true;
@@ -303,58 +324,70 @@ public class LyraNetwork {
         return sum;
     }
 
-    //Feeds the network
+    // Feeds the network
     public double[] feed(double[] inputs) {
         double[] outputs = new double[outputLayerSize];
 
-        if(!isInitialized) {
-            throw new IllegalStateException ("ERROR: MODEL NOT YET INITIALIZED");
+        if (!isInitialized) {
+            throw new IllegalStateException("ERROR: MODEL NOT YET INITIALIZED");
         }
 
-        //Prechecks
-        if(inputs.length != frontLayerSize) {
+        // Prechecks
+        if (inputs.length != frontLayerSize) {
             throw new IllegalStateException("ERROR: INPUT COUNT DOES NOT MATCH FIRST LAYER NEURON COUNT");
         }
 
-        //Enter the inputs in the network
+        // Load inputs into first layer neurons
         for (int i = 0; i < inputs.length; i++) {
             neuronNetwork[0][i].value = inputs[i];
+            hiddenValues[0][i] = inputs[i];
         }
 
-        //The actual process
-        //For every layer
-        for (int i = 1; i <= neuronNetwork.length - 1; i++) {
-            //For every neuron
+        int lastLayer = neuronNetwork.length - 1;
+
+        // Process each layer
+        for (int i = 1; i <= lastLayer; i++) {
             for (int j = 0; j < neuronNetwork[i].length; j++) {
-                //Sets the bias
-                hiddenValues[i][j] = neuronNetwork[i][j].bias;
-                //For every weight
+                double sum = neuronNetwork[i][j].bias;
+
+                // Weighted input sum
                 for (int k = 0; k < neuronNetwork[i][j].weights.length; k++) {
-                    //Adds up the previous neuron values times the weights
-                    hiddenValues[i][j] += neuronNetwork[i][j].weights[k] * neuronNetwork[i-1][k].value;
+                    sum += neuronNetwork[i][j].weights[k] * neuronNetwork[i - 1][k].value;
                 }
-                //Does a function on the value.
-                neuronNetwork[i][j].value = calculate(hiddenValues[i][j], false);
+
+                preActivationValues[i][j] = sum;
+
+                double activated;
+                if (i == lastLayer) {
+                    // OUTPUT layer: use sigmoid
+                    activated = sigmoid(sum);
+                } else {
+                    // HIDDEN layers: use your defined activation
+                    activated = calculate(sum, false);
+                }
+
+                hiddenValues[i][j] = activated;
+                neuronNetwork[i][j].value = activated;
             }
         }
 
-        //Returns the values of the last layer.
-        for (int i = 0; i <= outputLayerSize - 1; i++) {
-            outputs[i] = neuronNetwork[neuronNetwork.length - 1][i].value;
+        // Extract outputs from final layer
+        for (int i = 0; i < outputLayerSize; i++) {
+            outputs[i] = neuronNetwork[lastLayer][i].value;
         }
 
         return outputs;
     }
 
 
+
     public void train(double[][] inputs, double[][] expectedOutputs) {
-        if (!isInitialized) {
-            init();
-        }
+        System.out.println("Training...");
+        if (!isInitialized) init();
 
         int samples = inputs.length;
         long startTime = System.nanoTime();
-        int epochs = 0;
+        epochs = 0;
 
         while (true) {
             double totalError = 0.0;
@@ -363,48 +396,67 @@ public class LyraNetwork {
                 double[] input = inputs[sampleIndex];
                 double[] expected = expectedOutputs[sampleIndex];
 
-                // Forward pass
+                // ── FORWARD ──
                 hiddenValues[0] = input;
-                for (int layer = 1; layer < neuronNetwork.length; layer++) {
-                    hiddenValues[layer] = new double[neuronNetwork[layer].length];
-                    for (int j = 0; j < neuronNetwork[layer].length; j++) {
-                        double sum = 0.0;
+                int lastLayer = neuronNetwork.length - 1;
+
+                for (int layer = 1; layer <= lastLayer; layer++) {
+                    int size = neuronNetwork[layer].length;
+                    hiddenValues[layer] = new double[size];
+
+                    for (int j = 0; j < size; j++) {
+                        double sum = neuronNetwork[layer][j].bias;
                         for (int k = 0; k < neuronNetwork[layer - 1].length; k++) {
                             sum += hiddenValues[layer - 1][k] * neuronNetwork[layer][j].weights[k];
                         }
-                        sum += neuronNetwork[layer][j].bias;
-                        hiddenValues[layer][j] = calculate(sum, false);
+                        preActivationValues[layer][j] = sum;
+
+                        hiddenValues[layer][j] = (layer == lastLayer)
+                                ? sigmoid(sum)
+                                : calculate(sum, false);
                     }
                 }
 
-                // Calculate error (output layer)
-                double[] output = hiddenValues[hiddenValues.length - 1];
+                // ── ERROR ──
+                double[] output = hiddenValues[lastLayer];
                 double[] outputError = new double[output.length];
                 for (int i = 0; i < output.length; i++) {
                     outputError[i] = expected[i] - output[i];
                     totalError += outputError[i] * outputError[i];
                 }
 
-                // Backward pass
+                // ── BACKPROP ──
                 double[][] deltas = new double[neuronNetwork.length][];
-                for (int i = neuronNetwork.length - 1; i > 0; i--) {
-                    deltas[i] = new double[neuronNetwork[i].length];
-                    for (int j = 0; j < neuronNetwork[i].length; j++) {
-                        double outputVal = hiddenValues[i][j];
-                        double error = (i == neuronNetwork.length - 1) ?
-                                outputError[j] :
-                                sumDeltas(neuronNetwork[i + 1], deltas[i + 1], j);
-                        deltas[i][j] = error * calculate(outputVal, true);
+                for (int layer = lastLayer; layer > 0; layer--) {
+                    deltas[layer] = new double[neuronNetwork[layer].length];
+                    for (int j = 0; j < neuronNetwork[layer].length; j++) {
+                        double errorTerm;
+                        if (layer == lastLayer) {
+                            errorTerm = outputError[j];
+                        } else {
+                            errorTerm = sumDeltas(neuronNetwork[layer + 1], deltas[layer + 1], j);
+                        }
+
+                        double activation = hiddenValues[layer][j];
+                        double deriv;
+                        if (layer == lastLayer) {
+                            deriv = activation * (1 - activation); // sigmoid derivative
+                        } else {
+                            deriv = calculate(preActivationValues[layer][j], true); // general derivative
+                        }
+
+                        deltas[layer][j] = errorTerm * deriv;
                     }
                 }
 
-                // Weight & bias update
-                for (int i = 1; i < neuronNetwork.length; i++) {
-                    for (int j = 0; j < neuronNetwork[i].length; j++) {
-                        for (int k = 0; k < neuronNetwork[i - 1].length; k++) {
-                            neuronNetwork[i][j].weights[k] += learningRate * deltas[i][j] * hiddenValues[i - 1][k];
+                // ── WEIGHT UPDATES ──
+                for (int layer = 1; layer <= lastLayer; layer++) {
+                    for (int j = 0; j < neuronNetwork[layer].length; j++) {
+                        for (int k = 0; k < neuronNetwork[layer - 1].length; k++) {
+                            neuronNetwork[layer][j].weights[k] +=
+                                    learningRate * deltas[layer][j] * hiddenValues[layer - 1][k];
                         }
-                        neuronNetwork[i][j].bias += learningRate * deltas[i][j];
+                        neuronNetwork[layer][j].bias += learningRate * deltas[layer][j];
                     }
                 }
             }
@@ -412,7 +464,7 @@ public class LyraNetwork {
             totalError /= samples;
             epochs++;
 
-            if (showStatus) {
+            if (showStatus && epochs % statusInterval == 0) {
                 System.out.println("Epoch " + epochs + ", Error: " + totalError);
             }
 
@@ -424,6 +476,21 @@ public class LyraNetwork {
         }
 
         System.out.println("Training complete after " + epochs + " epochs.");
+    }
+
+    private double sigmoid(double x) {
+        if (!(Double.isNaN(x) || Double.isInfinite(x) && hasCrashed)) {
+            System.out.println(epochs);
+            hasCrashed = true;
+        }
+
+        if (x >= 0) {
+            double z = Math.exp(-x);
+            return 1 / (1 + z);
+        } else {
+            double z = Math.exp(x);
+            return z / (1 + z);
+        }
     }
 
 

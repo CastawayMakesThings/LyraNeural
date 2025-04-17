@@ -7,6 +7,8 @@
 A simple, lightweight, open-source, and easy API for integrating simple ai into your projects.
 NOTE: PLEASE DON'T JUDGE THE CODE.
 
+## WARNING, SIGMOID IS CURRENTLY BROKEN, USE ReLU.
+
 
 ## Authors
 
@@ -24,6 +26,10 @@ Lyra Neural is a simple ML API for Java, that works in a very basic way. Althoug
 [Latest Release | v 1.0.2](https://github.com/CastawayMakesThings/LyraNeural/releases/tag/v1.0.2)
 
 ## Changelog
+
+April 17, 2025:
+Fixed ReLU and tanh.
+Uploaded Lyra v1.0.3.
 
 April 13, 2025:
 Fixed training process.
