@@ -27,7 +27,7 @@ public class LyraNetwork {
     private long time = 0;
     private double goal = 0;
     public final String lyraFileVersion = "1.0";
-    public final String lyraAPIVersion = "1.0.2";
+    public final String lyraAPIVersion = "1.0.3";
     private boolean isInitialized = false;
     private int activationFunction = 1;
     private String modelMetadata;
