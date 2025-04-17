@@ -23,7 +23,7 @@ Lyra Neural is a simple ML API for Java, that works in a very basic way. Althoug
 
 ## Downloads
 
-[Latest Release | v 1.0.2](https://github.com/CastawayMakesThings/LyraNeural/releases/tag/v1.0.2)
+[Latest Release | v 1.0.2](https://github.com/CastawayMakesThings/LyraNeural/releases/tag/v1.0.3)
 
 ## Changelog
 
